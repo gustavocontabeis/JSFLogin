@@ -10,62 +10,66 @@ import javax.servlet.http.HttpSession;
 
 import com.journaldev.jsf.dao.LoginDAO;
 import com.journaldev.jsf.util.SessionUtils;
+import javax.faces.event.ActionEvent;
 
 @ManagedBean
 @SessionScoped
 public class Login implements Serializable {
 
-	private static final long serialVersionUID = 1094801825228386363L;
-	
-	private String pwd;
-	private String msg;
-	private String user;
+    private static final long serialVersionUID = 1094801825228386363L;
 
-	public String getPwd() {
-		return pwd;
-	}
+    private String pwd;
+    private String msg;
+    private String user;
 
-	public void setPwd(String pwd) {
-		this.pwd = pwd;
-	}
+    public String getPwd() {
+        return pwd;
+    }
 
-	public String getMsg() {
-		return msg;
-	}
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
 
-	public void setMsg(String msg) {
-		this.msg = msg;
-	}
+    public String getMsg() {
+        return msg;
+    }
 
-	public String getUser() {
-		return user;
-	}
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 
-	public void setUser(String user) {
-		this.user = user;
-	}
-	
-	//validate login
-	public String validateUsernamePassword() {
-		boolean valid = LoginDAO.validate(user, pwd);
-		if (valid) {
-			HttpSession session = SessionUtils.getSession();
-			session.setAttribute("username", user);
-			return "admin";
-		} else {
-			FacesContext.getCurrentInstance().addMessage(
-					null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN,
-							"Incorrect Username and Passowrd",
-							"Please enter correct username and Password"));
-			return "login";
-		}
-	}
+    public String getUser() {
+        return user;
+    }
 
-	//logout event, invalidate session
-	public String logout() {
-		HttpSession session = SessionUtils.getSession();
-		session.invalidate();
-		return "login";
-	}
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    //validate login
+    public void validateUsernamePassword(ActionEvent evt) {
+        Usuario usuario = LoginDAO.login(user, pwd);
+        if (usuario != null) {
+            HttpSession session = SessionUtils.getSession();
+            session.setAttribute("usuario", usuario);
+            Object destinoObj = session.getAttribute("destino");
+            if(destinoObj != null){
+                //redirecionar para o destino
+            }
+        } else {
+            FacesContext.getCurrentInstance().addMessage(
+                    null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            "Incorrect Username and Passowrd",
+                            "Please enter correct username and Password"));
+            //FacesContext.getCurrentInstance().;
+        }
+    }
+
+    //logout event, invalidate session
+    public String logout() {
+        HttpSession session = SessionUtils.getSession();
+        session.invalidate();
+        return "login";
+    }
 }
