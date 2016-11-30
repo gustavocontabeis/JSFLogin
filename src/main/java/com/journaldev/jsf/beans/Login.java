@@ -1,5 +1,6 @@
 package com.journaldev.jsf.beans;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.faces.application.FacesMessage;
@@ -55,6 +56,14 @@ public class Login implements Serializable {
             Object destinoObj = session.getAttribute("destino");
             if(destinoObj != null){
                 //redirecionar para o destino
+            	try {
+            		System.out.println("redirecionar para "+destinoObj);
+					FacesContext.getCurrentInstance().getExternalContext().redirect(destinoObj.toString());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	
             }
         } else {
             FacesContext.getCurrentInstance().addMessage(

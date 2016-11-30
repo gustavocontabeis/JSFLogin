@@ -16,7 +16,7 @@ public class LoginDAO {
         
         try {
             con = DataConnect.getConnection();
-            ps = con.prepareStatement("Select uname, password, roles from Users where uname = ? and password = ?");
+            ps = con.prepareStatement("Select uid, uname, password, roles from Users where uname = ? and password = ?");
             
             ps.setString(1, user);
             ps.setString(2, password);
@@ -25,13 +25,14 @@ public class LoginDAO {
             
             if (rs.next()) {
                 Usuario usuario = new Usuario();
-                usuario.setId(rs.getLong(0));
-                usuario.setNome(rs.getNString(1));
-                usuario.setSenha(rs.getNString(2));
-                usuario.setPerfis(rs.getNString(3).split(","));
+                usuario.setId(rs.getLong("uid"));
+                usuario.setNome(rs.getString("uname"));
+                usuario.setSenha(rs.getString("password"));
+                usuario.setPerfis(rs.getString("roles").split(","));
                 return usuario;
             }
         } catch (SQLException ex) {
+        	ex.printStackTrace();
             System.out.println("Login error -->" + ex.getMessage());
             return null;
         } finally {
@@ -39,4 +40,18 @@ public class LoginDAO {
         }
         return null;
     }
+
+	public static void execute(String sql) {
+		Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = DataConnect.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.execute();
+        } catch (SQLException ex) {
+        	ex.printStackTrace();
+        } finally {
+            DataConnect.close(con);
+        }	
+	}
 }

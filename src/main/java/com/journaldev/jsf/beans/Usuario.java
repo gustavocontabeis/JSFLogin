@@ -44,13 +44,15 @@ public class Usuario implements Serializable {
     }
 
     public boolean contemPerfil(String[] perfis) {
-        for (String perfil : this.perfis) {
-            for (String perfil2 : perfis) {
-                if(perfil.equals(perfil2)){
-                    return true;
-                }
-            }
-        }
+    	if(this.perfis!=null && perfis != null){
+    		for (String perfil : this.perfis) {
+    			for (String perfil2 : perfis) {
+    				if(perfil.equals(perfil2)){
+    					return true;
+    				}
+    			}
+    		}
+    	}
         return false;
     }
 

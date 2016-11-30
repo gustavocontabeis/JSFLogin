@@ -55,7 +55,7 @@ public class AuthorizationFilter implements Filter {
             }
 
             //verifica se é privada e se esta logado e se tem permissao.
-            String page = requestURI.replace(request.getContextPath(), "").replace(URL_PATTERN, "");
+            String page = requestURI.replace(request.getContextPath(), "").replace(URL_PATTERN, "").replaceAll(";jsessionid=.*.?", "");
             LOGGER.info("page: " + page);
             LOGGER.info("user?: " + (getUser(session) != null));
             
@@ -67,11 +67,12 @@ public class AuthorizationFilter implements Filter {
                         redirecionarLogin(request, response);
                     } else {
                         String redirecionarPara = (String) session.getAttribute(REDIRECIONAR_PARA);
-                        final String name = request.getContextPath() + URL_PATTERN + redirecionarPara;
+                        String name = URL_PATTERN + redirecionarPara;
                         response.sendRedirect(name);
                         LOGGER.info("redirecionado para "+name);
                     }
                 } else {
+                	session.setAttribute("destino", requestURI);
                     redirecionarLogin(request, response);
                 }
             }

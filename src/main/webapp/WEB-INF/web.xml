@@ -19,4 +19,10 @@
   <welcome-file-list>
     <welcome-file>faces/index.xhtml</welcome-file>
   </welcome-file-list>
+  
+   <listener>
+	<listener-class>
+	com.journaldev.jsf.util.MyAppServletContextListener
+    </listener-class>
+   </listener>
 </web-app>
