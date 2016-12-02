@@ -47,7 +47,7 @@ public class Usuario implements Serializable {
     	if(this.perfis!=null && perfis != null){
     		for (String perfil : this.perfis) {
     			for (String perfil2 : perfis) {
-    				if(perfil.equals(perfil2)){
+    				if(perfil.toUpperCase().equals(perfil2.toUpperCase())){
     					return true;
     				}
     			}

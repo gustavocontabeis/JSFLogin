@@ -9,7 +9,11 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.journaldev.jsf.dao.LoginDAO;
+import com.journaldev.jsf.filter.SegurancaFilter;
 import com.journaldev.jsf.util.SessionUtils;
 import javax.faces.event.ActionEvent;
 
@@ -17,68 +21,70 @@ import javax.faces.event.ActionEvent;
 @SessionScoped
 public class Login implements Serializable {
 
-    private static final long serialVersionUID = 1094801825228386363L;
+	private static final long serialVersionUID = 1L;
 
-    private String pwd;
-    private String msg;
-    private String user;
+	private static final Logger LOGGER = LoggerFactory.getLogger(Login.class.getSimpleName());
 
-    public String getPwd() {
-        return pwd;
-    }
+	private String pwd;
+	private String msg;
+	private String user;
 
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
-    }
+	public String getPwd() {
+		return pwd;
+	}
 
-    public String getMsg() {
-        return msg;
-    }
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
+	public String getMsg() {
+		return msg;
+	}
 
-    public String getUser() {
-        return user;
-    }
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
 
-    public void setUser(String user) {
-        this.user = user;
-    }
+	public String getUser() {
+		return user;
+	}
 
-    //validate login
-    public void validateUsernamePassword(ActionEvent evt) {
-        Usuario usuario = LoginDAO.login(user, pwd);
-        if (usuario != null) {
-            HttpSession session = SessionUtils.getSession();
-            session.setAttribute("usuario", usuario);
-            Object destinoObj = session.getAttribute("destino");
-            if(destinoObj != null){
-                //redirecionar para o destino
-            	try {
-            		System.out.println("redirecionar para "+destinoObj);
-					FacesContext.getCurrentInstance().getExternalContext().redirect(destinoObj.toString());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	// validate login
+	public void validateUsernamePassword(ActionEvent evt) {
+		try {
+			Usuario usuario = LoginDAO.login(user, pwd);
+			LOGGER.debug("Usuário logado? {}", usuario != null ? "Sim" : "Não");
+			if (usuario != null) {
+				HttpSession session = SessionUtils.getSession();
+				session.setAttribute("usuario", usuario);
+				LOGGER.debug("Usuário {} adicionado a sessão", usuario.getNome());
+				Object destinoObj = session.getAttribute("destino");
+				session.removeAttribute("destino");
+				LOGGER.debug("Destino? {}", destinoObj);
+				if (destinoObj == null) {
+					destinoObj = "/JSFLogin/";
+					LOGGER.debug("Você será encaminhado para a home");
 				}
-            	
-            }
-        } else {
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            "Incorrect Username and Passowrd",
-                            "Please enter correct username and Password"));
-            //FacesContext.getCurrentInstance().;
-        }
-    }
+				LOGGER.debug("Voce foi logado com sucesso e será encaminhado ao seu destino {}", destinoObj);
+				FacesContext.getCurrentInstance().getExternalContext().redirect(destinoObj.toString());
+			} else {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+						"Usuário ou senha incorretos", "Por favor coloque seu usuário de senha correto."));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    //logout event, invalidate session
-    public String logout() {
-        HttpSession session = SessionUtils.getSession();
-        session.invalidate();
-        return "login";
-    }
+	// logout event, invalidate session
+	public String logout() {
+		LOGGER.debug("Fim da sessão.");
+		HttpSession session = SessionUtils.getSession();
+		session.invalidate();
+		return "index";
+	}
 }
